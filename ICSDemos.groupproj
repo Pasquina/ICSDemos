@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{B202FDE4-BB99-46F5-A8A5-CD809D21B7F2}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="ICSHTMLMail\HTMLSendMail.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="HTMLSendMail">
+        <MSBuild Projects="ICSHTMLMail\HTMLSendMail.dproj"/>
+    </Target>
+    <Target Name="HTMLSendMail:Clean">
+        <MSBuild Projects="ICSHTMLMail\HTMLSendMail.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="HTMLSendMail:Make">
+        <MSBuild Projects="ICSHTMLMail\HTMLSendMail.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="HTMLSendMail"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="HTMLSendMail:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="HTMLSendMail:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

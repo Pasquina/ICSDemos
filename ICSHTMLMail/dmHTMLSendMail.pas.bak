@@ -1,0 +1,108 @@
+unit dmHTMLSendMail;
+
+interface
+
+uses
+  System.SysUtils,
+  System.Classes,
+  System.IniFiles,
+  pVersionUtility,
+  pAuxEtc;
+
+type
+  TdHTMLSendMail = class(TDataModule)
+    vuMain: TVersionUtility;
+    procedure DataModuleDestroy(Sender: TObject);
+
+  private
+    { Private declarations }
+    FProgIni: TMemIniFile;
+    FLogMsg: TLogMsg;
+    procedure SetProgIni(const Value: TMemIniFile);
+    procedure SetLogMsg(const Value: TLogMsg);
+    property ProgIni: TMemIniFile read FProgIni write SetProgIni;
+    property LogMsg: TLogMsg read FLogMsg write SetLogMsg;
+  public
+    { Public declarations }
+    function Initialize(const ALogMsg: TLogMsg): string;
+    function GetServerParams: RServerConnection;
+    function SaveServerParams(const ServerConnection: RServerConnection; const AForceWrite: boolean = False): boolean;
+  end;
+
+var
+  dHTMLSendMail: TdHTMLSendMail;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+
+uses
+  System.IOUtils;
+
+{$R *.dfm}
+
+{ TdHTMLSendMail }
+
+procedure TdHTMLSendMail.DataModuleDestroy(Sender: TObject);
+begin
+  ProgIni.Free; // release ini file and automtically save it
+end;
+
+{ Returns a record that contains the Server Parameters stored in the ini file. }
+
+function TdHTMLSendMail.GetServerParams: RServerConnection;
+begin
+  Result := RServerConnection.Create(ProgIni.ReadString('Server', 'ServerHostName', 'Server Host Name'),
+    ProgIni.ReadString('Server', 'ServerPort', 'Server Port'),
+    ProgIni.ReadString('Server', 'ServerLoginName', 'Server Login Name'),
+    ProgIni.ReadString('Server', 'ServerLoginPassword', 'Server Login Password'));
+end;
+
+function TdHTMLSendMail.Initialize(const ALogMsg: TLogMsg): string;
+begin
+  Result := vuMain.AppParameters;                                         // obtain the application parameter FQDN
+  ForceDirectories(ExtractFileDir(Result));                               // make sure the path exists
+  ProgIni := TMemIniFile.Create(Result);                                  // open the parameters
+  ProgIni.AutoSave := True;                                               // automatic save before destruction
+  ProgIni.WriteString('TestSection', 'SomeValue', 'Here is the string.'); // testing only; remove later
+end;
+
+{ Writes the Server Parameter Values into the memini file }
+
+function TdHTMLSendMail.SaveServerParams(
+  const ServerConnection: RServerConnection; const AForceWrite: boolean = False): boolean;
+begin
+
+  Result := True;
+
+  try
+    with ServerConnection do
+    begin
+      ProgIni.WriteString('Server', 'ServerHostName', ServerHostName);           // update the
+      ProgIni.WriteString('Server', 'ServerPort', ServerPort);                   // memini file
+      ProgIni.WriteString('Server', 'ServerLoginName', ServerLoginName);         // with the
+      ProgIni.WriteString('Server', 'ServerLoginPassword', ServerLoginPassword); // current server parameter values
+    end;
+    if AForceWrite then                                                          // test the write file request
+      ProgIni.UpdateFile;                                                        // requested: write the file
+  except
+    on E: Exception do
+    begin
+    LogMsg(emsError, E.Message, []);
+    Result := False;                                                              // satisfactory result
+    end;
+  end;
+end;
+
+procedure TdHTMLSendMail.SetLogMsg(const Value: TLogMsg);
+begin
+  FLogMsg := Value;
+end;
+
+procedure TdHTMLSendMail.SetProgIni(const Value: TMemIniFile);
+begin
+  FProgIni := Value;
+end;
+
+end.
