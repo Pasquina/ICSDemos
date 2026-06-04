@@ -195,11 +195,12 @@ object fHTMLSendMail: TfHTMLSendMail
           Height = 275
           Align = alClient
           Lines.Strings = (
-            '<h1>HTM Test Messate</h1>'
+            '<h1>HTM Test Message</h1>'
             
-              '<p>This is a test message to determine the correct way to handle' +
-              ' the ICS SMTP components.</p>'
-            '<p>No reply is expected or necessary.</p>'
+              '<p>This is a test me'#223'age to determine the correct way to handle ' +
+              'the ICS SMTP components.'#169'</p>'
+            '<p>No reply is expected or nece'#223'ary.</p>'
+            '<p>It'#39's a warm 78'#176'C in Chicago.</p>'
             '<p>Milan</p>')
           TabOrder = 0
           ExplicitWidth = 848
@@ -240,9 +241,11 @@ object fHTMLSendMail: TfHTMLSendMail
             'Plain Text Message'
             ''
             
-              'This is a test message to determine the correct way to handle th' +
-              'e ICS SMTP components.'
+              'This is a test me'#223'age to determine the correct way to handle the' +
+              ' ICS SMTP components.'
             'No reply is expected or necessary.'
+            ''
+            'See '#167'5.5 for the '#8474'uick view of details.'
             'Milan'
             '')
           TabOrder = 0
@@ -395,25 +398,25 @@ object fHTMLSendMail: TfHTMLSendMail
     LocalAddr = '0.0.0.0'
     LocalAddr6 = '::'
     Port = '465'
-    SignOn = 'Milan@Lionwood'
-    Password = '77SunSet#Strip'
     AuthType = smtpAuthAutoSelect
     ConfirmReceipt = False
     RcptName.Strings = (
       'Milan@Lionwood.com')
-    HdrSubject = 'Testing yet another SendMail Implementation'
+    HdrSubject = 'Testing yet another SendMail 78'#176'F Implementation'#169
     HdrPriority = smtpPriorityNone
     CharSet = 'utf-8'
     ConvertToCharset = True
     WrapMsgMaxLineLen = 76
-    SendMode = smtpToSocket
-    DefaultEncoding = smtpEnc7bit
-    Allow8bitChars = True
+    SendMode = smtpCopyToStream
+    DefaultEncoding = smtpEncQuotedPrintable
+    Allow8bitChars = False
     FoldHeaders = False
     WrapMessageText = False
     ContentType = smtpHtml
     OwnHeaders = False
     OnRequestDone = shscMainRequestDone
+    OnSessionConnected = shscMainSessionConnected
+    OnBeforeOutStreamFree = shscMainBeforeOutStreamFree
     XMailer = 'ICS SMTP Component V%VER%'
     ProxyType = smtpNoProxy
     ProxyHttpAuthType = htatDetect

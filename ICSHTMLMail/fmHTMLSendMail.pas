@@ -60,6 +60,8 @@ type
     procedure shscMainSslVerifyPeer(Sender: TObject; var Ok: Integer;
       Cert: TX509Base);
     procedure FormCreate(Sender: TObject);
+    procedure shscMainBeforeOutStreamFree(Sender: TObject);
+    procedure shscMainSessionConnected(Sender: TObject; ErrCode: Word);
 
   private
     { Private declarations }
@@ -171,60 +173,93 @@ begin
   FEhloCount := Value;
 end;
 
+{ Add the MIME message lines to the message box as a debugging tool. }
+
+procedure TfHTMLSendMail.shscMainBeforeOutStreamFree(Sender: TObject);
+var
+  LStreamLines: TStringList;                                                   // conversion work area
+begin
+  LStreamLines := TStringList.Create;                                          // create the work area
+  try
+    with TSslHtmlSmtpCli(Sender) do                                            // always reference the event source
+    begin
+      LogMsg(emsInfo, 'Generated MIME message follows =================', []); // separator message
+      OutStream.Position := 0;                                                 // start from the beginning
+      LStreamLines.LoadFromStream(OutStream);                                  // create lines from the stream
+      meMessages.Lines.AddStrings(LStreamLines);                               // add the lines to the memo
+    end;
+  finally
+    LStreamLines.Free;                                                         // done, go home
+  end;
+end;
+
+{ Display the status after each operation. }
+
 procedure TfHTMLSendMail.shscMainRequestDone(Sender: TObject;
   RqType: TSmtpRequest; ErrorCode: Word);
 begin
 
-  { Display the status after each operation. }
+  { Quit if an unexpected error is encountered.
+    Initiate next request in the conversation. }
 
-  { Quit if an unexpected error is encountered. }
-
-  if (ErrorCode <> 0) then                       // test for error
+  if (ErrorCode <> 0) then                                   // test for error
   begin
     LogMsg(emsError, 'Request %s completed. Completion code: %u; %s.', [RqType.ToString, ErrorCode, shscMain.ErrorMessage]);
-    shscMain.Quit;                               // terminate any outstanding operations
-    Exit;                                        // immediate exit
+    shscMain.Quit;                                           // terminate any outstanding operations
+    Exit;                                                    // immediate exit
   end
   else
     LogMsg(emsInfo, 'Request %s completed. Completion code: %u; %s.', [RqType.ToString, ErrorCode, shscMain.ErrorMessage]);
 
   { After each operation, select the appropriate operation to continue sending. }
 
-  case RqType of                                 // determine sequence by testing the request type
-    smtpConnect:                                 // following a successful connect
+  case RqType of                                             // determine sequence by testing the request type
+    smtpConnect:                                             // following a successful connect
       begin
-        if shscMain.AuthType = smtpAuthNone then // AuthNone requires a different salutation
-          shscMain.Helo                          // no authorization (must be accepted by server)
+        if shscMain.AuthType = smtpAuthNone then             // AuthNone requires a different salutation
+          shscMain.Helo                                      // no authorization (must be accepted by server)
         else
-          shscMain.Ehlo;                         // begin authorization processing
+          shscMain.Ehlo;                                     // begin authorization processing
       end;
     smtpHelo:
-      shscMain.MailFrom;                         // after a successful Helo, jump right in to MailFrom
+      shscMain.MailFrom;                                     // after a successful Helo, jump right in to MailFrom
     smtpEhlo:
-      if shscMain.SslType = smtpTlsExplicit then // with explicit TLS the client must ask to start TLS
+      if shscMain.SslType = smtpTlsExplicit then             // with explicit TLS the client must ask to start TLS
       begin
-        Inc(FEhloCount);                         // the count is assumed to start at zero
-        if FEhloCount = 1 then                   // the first time causes the request for TLS to be sent
-          shscMain.StartTls                      // explicit TLS request
-        else if FEhloCount > 1 then              // subsequently, a successful StartTLS resumes the processing
-          shscMain.Auth;                         // continue on to authorization
+        Inc(FEhloCount);                                     // the count is assumed to start at zero
+        if FEhloCount = 1 then                               // the first time causes the request for TLS to be sent
+          shscMain.StartTls                                  // explicit TLS request
+        else if FEhloCount > 1 then                          // subsequently, a successful StartTLS resumes the processing
+          shscMain.Auth;                                     // continue on to authorization
       end
-      else                                       // the request was Implicit TLS
-        shscMain.Auth;                           // so just go on to authorization
-    smtpStartTls:                                // the result of explicit TLS is to start it
-      shscMain.Ehlo;                             // re-issue the Ehlo command following the StartTLS
-    smtpAuth:                                    // finally authenticated and authorized
-      shscMain.MailFrom;                         // continue with the MailFrom
-    smtpMailFrom:                                // MailFrom success
-      shscMain.RcptTo;                           // keep going with RcptTo
-    smtpRcptTo:                                  // ReptTo is OK
-      shscMain.Data;                             // Now it's time for real data
-    smtpData:                                    // at long last, all done
-      shscMain.Quit;                             // so let's quite and get on with things
-    smtpQuit:                                    // a successful quit
-      ShowMessage('Completed');                  // log it and we're done
+      else                                                   // the request was Implicit TLS
+        shscMain.Auth;                                       // so just go on to authorization
+    smtpStartTls:                                            // the result of explicit TLS is to start it
+      shscMain.Ehlo;                                         // re-issue the Ehlo command following the StartTLS
+    smtpAuth:                                                // finally authenticated and authorized
+      shscMain.MailFrom;                                     // continue with the MailFrom
+    smtpMailFrom:                                            // MailFrom success
+      shscMain.RcptTo;                                       // keep going with RcptTo
+    smtpRcptTo:                                              // ReptTo is OK
+      shscMain.Data;                                         // Now it's time for real data
+    smtpData:                                                // at long last, all done
+      shscMain.Quit;                                         // so let's quite and get on with things
+    smtpQuit:                                                // a successful quit
+      ShowMessage('Completed');                              // log it and we're done
   end;
 end;
+
+{ Create the memory stream for logging the email content.
+  Note that the existing code only logs the RFC MIME content; it does not contain
+  the envelope commands, which are handled by a different object. }
+
+procedure TfHTMLSendMail.shscMainSessionConnected(Sender: TObject;
+  ErrCode: Word);
+begin
+  TSslHtmlSmtpCli(Sender).OutStream := TMemoryStream.Create; // create the filestream for logging content
+end;
+
+{ Logs the peer verification and certificate chain for examination. }
 
 procedure TfHTMLSendMail.shscMainSslVerifyPeer(Sender: TObject; var Ok: Integer;
   Cert: TX509Base);
