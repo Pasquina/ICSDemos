@@ -27,7 +27,7 @@ uses
   Vcl.ComCtrls;
 
 type
-  TfHTMLSendMail = class(TForm)
+  TfHTMLSendMail = class(TForm, ILogMsg)
     svMain: TSplitView;
     pnMaian: TPanel;
     shscMain: TSslHtmlSmtpCli;
@@ -68,11 +68,21 @@ type
     FEhloCount: Integer;
     procedure SetEhloCount(const Value: Integer);
     property EhloCount: Integer read FEhloCount write SetEhloCount;
-    function LogMsg(const AMsgSeverity: EMsgSeverity; const AMessage: String; const AParams: array of TVarRec): boolean;
     function ApplyServerParams: boolean;
 
   public
     { Public declarations }
+
+    { Interface logging Methods. Note the next four lines enables the handling of
+      the Logging overload via a remapping of interface methods. The utilizing
+      code must choose the correct overload by distinct name which is then
+      remapped to the overloads via the function equivalences. }
+
+    function LogMsg(const AMsgSeverity: EMsgSeverity; const AMessage: String; const AParams: array of TVarRec): boolean; overload;
+    function LogMsg(const AMsgSeverity: EMsgSeverity; const AMessage: String; const AParams: array of TVarRec; var ANewLines: TStringList): boolean; overload;
+    { Remap to the correct overload.  }
+    function ILogMsg.LogMsg = LogMsg;
+    function ILogMsg.LogMsgLines = LogMsg;
   end;
 
 var
@@ -110,7 +120,6 @@ begin
     leServerLoginName.Text,                                       // invoke the
     leServerLoginPassword.Text)) then                             // inifile update routine
   begin
-
     LogMsg(emsInfo, 'Server parameters successfuly saved.', []);  // log success
     Result := True;
   end
@@ -144,7 +153,8 @@ procedure TfHTMLSendMail.FormCreate(Sender: TObject);
 var
   LServerConnection: RServerConnection;                           // Server Connection Parameters
 begin
-  sbMain.SimpleText := dHTMLSendMail.Initialize(LogMsg);          // initialize and obtain the inifile FQDN for display
+  meMessages.Lines.Clear;                                         // clear the box
+  sbMain.SimpleText := dHTMLSendMail.Initialize(Self);            // initialize and obtain the inifile FQDN for display
   LServerConnection := dHTMLSendMail.GetServerParams;             // request parameters for server connection
   with LServerConnection do                                       // move the parameters
   begin                                                           // from the request record
@@ -155,7 +165,19 @@ begin
   end;
 end;
 
-{ Local Message Logging uses memo box to display messages in a uniform format. }
+{ Overloaded message functions. Both add a message line. One adds new lines to the
+  end of the memo box as well.  }
+
+function TfHTMLSendMail.LogMsg(const AMsgSeverity: EMsgSeverity;
+  const AMessage: String; const AParams: array of TVarRec;
+  var ANewLines: TStringList): boolean;
+begin
+  Result := LogMsg(AMsgSeverity, AMessage, AParams);    // format and insert the message
+  meMessages.Lines.AddStrings(ANewLines);                                               // append the new lines to the end of the memo box
+end;
+
+{ Local Message Logging uses memo box to display messages in a uniform format.
+  This overload adds a simple one line message to the memo box.  }
 
 function TfHTMLSendMail.LogMsg(const AMsgSeverity: EMsgSeverity; const AMessage: String; const AParams: array of TVarRec): boolean;
 begin

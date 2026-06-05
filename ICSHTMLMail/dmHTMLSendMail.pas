@@ -7,25 +7,34 @@ uses
   System.Classes,
   System.IniFiles,
   pVersionUtility,
-  pAuxEtc;
+  pAuxEtc,
+  OverbyteIcsTypes,
+  OverbyteIcsSslBase,
+  OverbyteIcsWndControl,
+  OverbyteIcsSmtpProt;
 
 type
   TdHTMLSendMail = class(TDataModule)
     vuMain: TVersionUtility;
+    shscMain: TSslHtmlSmtpCli;
+    SslHtmlSmtpCli1: TSslHtmlSmtpCli;
     procedure DataModuleDestroy(Sender: TObject);
+    procedure shscMainAfterFileOpen(Sender: TObject; Idx: Integer;
+      FileName: string; E: Exception; var Action: TSmtpAfterOpenFileAction);
+    procedure shscMainBeforeOutStreamFree(Sender: TObject);
 
   private
     { Private declarations }
     FProgIni: TMemIniFile;
-    FLogMsg: TLogMsg;
+    FLogMsg: ILogMsg;
     procedure SetProgIni(const Value: TMemIniFile);
-    procedure SetLogMsg(const Value: TLogMsg);
+    procedure SetLogMsg(const Value: ILogMsg);
     property ProgIni: TMemIniFile read FProgIni write SetProgIni;
-    property LogMsg: TLogMsg read FLogMsg write SetLogMsg;
+    property LogMsg: ILogMsg read FLogMsg write SetLogMsg;
 
   public
     { Public declarations }
-    function Initialize(const ALogMsg: TLogMsg): string;
+    function Initialize(const ALogMsg: ILogMsg): string;
     function GetServerParams: RServerConnection;
     function SaveServerParams(const ServerConnection: RServerConnection; const AForceWrite: boolean = False): boolean;
   end;
@@ -60,13 +69,15 @@ begin
     ProgIni.ReadString('Server', 'ServerLoginPassword', 'Server Login Password'));
 end;
 
-function TdHTMLSendMail.Initialize(const ALogMsg: TLogMsg): string;
+function TdHTMLSendMail.Initialize(const ALogMsg: ILogMsg): string;
 begin
+  LogMsg := ALogMsg;                                                      // save logging callback address
   Result := vuMain.AppParameters;                                         // obtain the application parameter FQDN
   ForceDirectories(ExtractFileDir(Result));                               // make sure the path exists
   ProgIni := TMemIniFile.Create(Result);                                  // open the parameters
   ProgIni.AutoSave := True;                                               // automatic save before destruction
   ProgIni.WriteString('TestSection', 'SomeValue', 'Here is the string.'); // testing only; remove later
+  LogMsg.LogMsg(emsInfo, 'Initialization completed.', []);                // log initialization event
 end;
 
 { Writes the Server Parameter Values into the memini file }
@@ -90,13 +101,13 @@ begin
   except
     on E: Exception do                                                           // not expecting any but just in case
     begin
-      LogMsg(emsError, E.Message, []);                                           // display the message
+      LogMsg.LogMsg(emsError, E.Message, []);                                    // display the message
       Result := False;                                                           // no success
     end;
   end;
 end;
 
-procedure TdHTMLSendMail.SetLogMsg(const Value: TLogMsg);
+procedure TdHTMLSendMail.SetLogMsg(const Value: ILogMsg);
 begin
   FLogMsg := Value;
 end;
@@ -104,6 +115,31 @@ end;
 procedure TdHTMLSendMail.SetProgIni(const Value: TMemIniFile);
 begin
   FProgIni := Value;
+end;
+
+procedure TdHTMLSendMail.shscMainAfterFileOpen(Sender: TObject; Idx: Integer;
+  FileName: string; E: Exception; var Action: TSmtpAfterOpenFileAction);
+begin
+
+end;
+
+{ Add the MIME message lines to the message box as a debugging tool. }
+
+procedure TdHTMLSendMail.shscMainBeforeOutStreamFree(Sender: TObject);
+var
+  LStreamLines: TStringList;                                                                             // conversion work area
+begin
+  LStreamLines := TStringList.Create;                                                                    // create the work area
+  try
+    with TSslHtmlSmtpCli(Sender) do                                                                      // always reference the event source
+    begin
+      OutStream.Position := 0;                                                                           // start from the beginning
+      LStreamLines.LoadFromStream(OutStream);                                                            // create lines from the stream
+      LogMsg.LogMsgLines(emsInfo, 'Generated MIME message follows =================', [], LStreamLines); // separator message
+    end;
+  finally
+    LStreamLines.Free;                                                                                   // done, go home
+  end;
 end;
 
 end.

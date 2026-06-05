@@ -8,7 +8,8 @@ unit pAuxEtc;
 
 interface
 
-uses OverbyteIcsTypes;
+uses OverbyteIcsTypes,
+  System.Classes;
 
 type
 
@@ -47,7 +48,11 @@ type
     constructor Create(const AServerHostName: string; AServerPort: string; const AServerLoginName: string; AServerLoginPassword: string);
   end;
 
-  TLogMsg = function(const AMsgSeverity: EMsgSeverity; const AMessage: String; const AParams: array of TVarRec): boolean of object;
+  ILogMsg = interface
+    ['{FB78C070-A55D-443C-9DF5-C0D7265F2AEB}']
+    function LogMsg(const AMsgSeverity: EMsgSeverity; const AMessage: String; const AParams: array of TVarRec): boolean;
+    function LogMsgLines(const AMsgSeverity: EMsgSeverity; const AMessage: String; const AParams: array of TVarRec; var ANewLines: TStringList): boolean;
+  end;
 
 implementation
 
