@@ -24,7 +24,7 @@ uses
   OverbyteIcsWndControl,
   OverbyteIcsSmtpProt,
   pAuxEtc,
-  Vcl.ComCtrls, IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient;
+  Vcl.ComCtrls;
 
 type
   TfHTMLSendMail = class(TForm, ILogMsg)
@@ -83,15 +83,16 @@ uses
 
 {$R *.dfm}
 
+
 { Send one email message using the parameters entered. }
 
 procedure TfHTMLSendMail.btSendMailClick(Sender: TObject);
 begin
-//  meMessages.Lines.Clear;                              // clear the message display
-  if dHTMLSendMail.SendMail(RServerConnection.Create(  // invoke the SendMail action
+  meMessages.Lines.Clear;                                         // clear the message display
+  if dHTMLSendMail.SendMail(RServerConnection.Create(             // invoke the SendMail action
     leServerHostName.Text, leServerPort.Text, leServerLoginName.Text, leServerLoginPassword.Text),
-    meHTMLText.Lines,                                  // transmit lines
-    mePlainText.Lines,                                 // transmit lines
+    meHTMLText.Lines,                                             // transmit lines
+    mePlainText.Lines,                                            // transmit lines
     True) then
     LogMsg(emsInfo, 'Send Mail completed successfully', [])
   else
@@ -143,7 +144,7 @@ end;
 
 procedure TfHTMLSendMail.svMainDblClick(Sender: TObject);
 begin
-  svMain.Opened := NOT svMain.Opened;                  // toggle the split view  open and closed
+  svMain.Opened := NOT svMain.Opened; // toggle the split view  open and closed
 end;
 
 end.

@@ -1,6 +1,9 @@
 unit pAuxEtc;
 
-{ Implements a helper class for the ICS TSMTPRequest enumeration.
+{ Implements helper classes for various ICS enumerations.
+  Defines records with constructors for convenient and efficient passing of
+    component properties between methods.
+  Defines any needed Interfaces that might be required for archetectural reasons.
   Author: Milan Vydareny
   Permission granted for commercial and private use.
   Attribution appreciated, but not required.
@@ -47,6 +50,8 @@ type
     ServerLoginPassword: string;                                // SMTP Server Login Password
     constructor Create(const AServerHostName: string; AServerPort: string; const AServerLoginName: string; AServerLoginPassword: string);
   end;
+
+  { Interface used to centralize the logging of the system. }
 
   ILogMsg = interface
     ['{FB78C070-A55D-443C-9DF5-C0D7265F2AEB}']

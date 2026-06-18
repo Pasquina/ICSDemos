@@ -24,7 +24,7 @@ object fHTMLSendMail: TfHTMLSendMail
     TabOrder = 0
     OnDblClick = svMainDblClick
     ExplicitHeight = 1119
-    object Button1: TButton
+    object btSendMail: TButton
       AlignWithMargins = True
       Left = 15
       Top = 15
@@ -37,7 +37,7 @@ object fHTMLSendMail: TfHTMLSendMail
       Align = alTop
       Caption = 'Send Mail'
       TabOrder = 0
-      OnClick = Button1Click
+      OnClick = btSendMailClick
     end
     object StatusBar1: TStatusBar
       Left = 0
@@ -391,80 +391,5 @@ object fHTMLSendMail: TfHTMLSendMail
       ExplicitTop = 1099
       ExplicitWidth = 858
     end
-  end
-  object shscMain: TSslHtmlSmtpCli
-    Tag = 0
-    ShareMode = smtpShareDenyWrite
-    LocalAddr = '0.0.0.0'
-    LocalAddr6 = '::'
-    Port = '465'
-    AuthType = smtpAuthAutoSelect
-    ConfirmReceipt = False
-    RcptName.Strings = (
-      'Milan@Lionwood.com')
-    HdrSubject = 'Testing yet another SendMail 78'#176'F Implementation'#169
-    HdrPriority = smtpPriorityNone
-    CharSet = 'utf-8'
-    ConvertToCharset = True
-    WrapMsgMaxLineLen = 76
-    SendMode = smtpCopyToStream
-    DefaultEncoding = smtpEncQuotedPrintable
-    Allow8bitChars = False
-    FoldHeaders = False
-    WrapMessageText = False
-    ContentType = smtpHtml
-    OwnHeaders = False
-    OnRequestDone = shscMainRequestDone
-    OnSessionConnected = shscMainSessionConnected
-    OnBeforeOutStreamFree = shscMainBeforeOutStreamFree
-    XMailer = 'ICS SMTP Component V%VER%'
-    ProxyType = smtpNoProxy
-    ProxyHttpAuthType = htatDetect
-    SocketFamily = sfIPv4
-    SocketErrs = wsErrTech
-    WSDebugOptions = [wsdlogHdr]
-    Timeout = 60
-    SslType = smtpTlsImplicit
-    SslContext = SslContext1
-    OnSslVerifyPeer = shscMainSslVerifyPeer
-    HtmlCharSet = 'utf-8'
-    HtmlConvertToCharset = True
-    SslCertVerMethod = CertVerNone
-    SslAllowSelfSign = False
-    Left = 61
-    Top = 1041
-  end
-  object SslContext1: TSslContext
-    SslVerifyPeer = True
-    SslVerifyDepth = 9
-    SslVerifyFlags = []
-    SslVerifyFlagsValue = 0
-    SslCheckHostFlags = []
-    SslCheckHostFlagsValue = 0
-    SslSecLevel = sslSecLevel112bits
-    SslOptions = [sslOpt_NO_SSLv2]
-    SslOptions2 = []
-    SslVerifyPeerModes = [SslVerifyMode_PEER]
-    SslVerifyPeerModesValue = 1
-    SslSessionCacheModes = [sslSESS_CACHE_CLIENT]
-    SslCipherList = 'ALL'
-    SslCipherList13 = 
-      'TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_' +
-      'GCM_SHA256'
-    SslVersionMethod = sslTLS_V1_2_CLIENT
-    SslMinVersion = sslVerTLS1_2
-    SslMaxVersion = sslVerMax
-    SslECDHMethod = sslECDHAuto
-    SslCryptoGroups = 'P-256:X25519:P-384:P-512'
-    SslCliSecurity = sslCliSecIgnore
-    SslOcspStatus = False
-    UseSharedCAStore = True
-    CliCertTypes = []
-    SrvCertTypes = [CertTypeX509]
-    SslSessionTimeout = 300000
-    SslSessionCacheSize = 20480
-    AutoEnableBuiltinEngines = False
-    Left = 162
-    Top = 1040
   end
 end
