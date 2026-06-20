@@ -1,13 +1,7 @@
 object dHTMLSendMail: TdHTMLSendMail
-  OnDestroy = DataModuleDestroy
   Height = 1080
   Width = 1440
   PixelsPerInch = 144
-  object vuMain: TVersionUtility
-    AppName = 'HTMSendMail'
-    Left = 416
-    Top = 88
-  end
   object shscMain: TSslHtmlSmtpCli
     Tag = 0
     ShareMode = smtpShareDenyWrite

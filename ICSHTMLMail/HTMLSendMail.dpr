@@ -6,7 +6,8 @@ uses
   Vcl.Themes,
   Vcl.Styles,
   pAuxEtc in 'pAuxEtc.pas',
-  dmHTMLSendMail in 'dmHTMLSendMail.pas' {dHTMLSendMail: TDataModule};
+  dmHTMLSendMail in 'dmHTMLSendMail.pas' {dHTMLSendMail: TDataModule},
+  pIniMgr in 'pIniMgr.pas';
 
 {$R *.res}
 

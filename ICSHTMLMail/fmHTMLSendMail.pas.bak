@@ -5,11 +5,13 @@ interface
 uses
   Winapi.Windows,
   Winapi.Messages,
+  System.Inifiles,
   System.SysUtils,
   System.Variants,
   System.Classes,
   Vcl.Graphics,
   Vcl.Controls,
+  Vcl.ComCtrls,
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.Buttons,
@@ -24,7 +26,8 @@ uses
   OverbyteIcsWndControl,
   OverbyteIcsSmtpProt,
   pAuxEtc,
-  Vcl.ComCtrls;
+  pIniMgr,
+  pVersionUtility;
 
 type
   TfHTMLSendMail = class(TForm, ILogMsg)
@@ -50,13 +53,18 @@ type
     gpInternals: TGridPanel;
     StatusBar1: TStatusBar;
     sbMain: TStatusBar;
+    vuMain: TVersionUtility;
     procedure sbDrawerClick(Sender: TObject);
     procedure svMainDblClick(Sender: TObject);
     procedure btSendMailClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
 
   private
+    FIniFileMgr: IIniFileMgr;
+    procedure SetIniFileMgr(const Value: IIniFileMgr);
     { Private declarations }
+
+    property IniFileMgr: IIniFileMgr read FIniFileMgr write SetIniFileMgr;
 
   public
     { Public declarations }
@@ -83,17 +91,20 @@ uses
 
 {$R *.dfm}
 
-
 { Send one email message using the parameters entered. }
 
 procedure TfHTMLSendMail.btSendMailClick(Sender: TObject);
+var
+  LServerConnection: RServerConnection;                 // Server Connection Parameters
 begin
-  meMessages.Lines.Clear;                                         // clear the message display
-  if dHTMLSendMail.SendMail(RServerConnection.Create(             // invoke the SendMail action
-    leServerHostName.Text, leServerPort.Text, leServerLoginName.Text, leServerLoginPassword.Text),
-    meHTMLText.Lines,                                             // transmit lines
-    mePlainText.Lines,                                            // transmit lines
-    True) then
+  LServerConnection.Create(leServerHostName.Text,       // build the connection parameters record
+    leServerPort.Text,
+    leServerLoginName.Text,
+    leServerLoginPassword.Text);
+  IniFileMgr.SaveServerParams(LServerConnection, True); // save the server parameters used in this call
+  if dHTMLSendMail.SendMail(LServerConnection,          // invoke the SendMail action
+    meHTMLText.Lines,
+    mePlainText.Lines) then
     LogMsg(emsInfo, 'Send Mail completed successfully', [])
   else
     LogMsg(emsError, 'Send Email completed with errors.', []);
@@ -103,17 +114,34 @@ end;
 
 procedure TfHTMLSendMail.FormCreate(Sender: TObject);
 var
-  LServerConnection: RServerConnection;                // Server Connection Parameters
+  LServerConnection: RServerConnection;                           // Server Connection Parameters
+  LAppParameters: TFileName;                                      // Application parameters ini file FQDN
+  LOpenSSL_Lib_Path: string;                                      // Open SSL Library Path from command line parameter
 begin
-  meMessages.Lines.Clear;                              // clear the box
-  sbMain.SimpleText := dHTMLSendMail.Initialize(Self); // initialize and obtain the inifile FQDN for display
-  LServerConnection := dHTMLSendMail.GetServerParams;  // request parameters for server connection
-  with LServerConnection do                            // move the parameters
-  begin                                                // from the request record
-    leServerHostName.Text := ServerHostName;           // to the individual
-    leServerPort.Text := ServerPort;                   // controls
-    leServerLoginName.Text := ServerLoginName;         // on the
-    leServerLoginPassword.Text := ServerLoginPassword; // form
+  { process command line parameters }
+
+  { Extracts the target directory command line parameters that contains the OpenSSL libraries and sets
+  the GLOBAL variable GSSL_DLL_DIR.
+
+  Warning: GSSL_DLL_DIR is defined in OverbyteIcsTypes.pas and MUST NOT be redefined here. Declaring
+  it as a global variable here actually results in a different variable and you'll end up in
+  either variable or .dll hell. }
+
+  FindCmdLineSwitch('OpenSSL_Lib_Path', LOpenSSL_Lib_Path, True); // see if a parameter is available
+  dHTMLSendMail.Initialize(Self, LOpenSSL_Lib_Path);              // initialize SendMail Logic; set OpenSSL path
+
+  LAppParameters := vuMain.AppParameters;                         // obtain the application parameter FQDN
+  sbMain.SimpleText := LAppParameters;                            // display application parameter FQDN
+  IniFileMgr := TIniFileMgr.Create(Self, LAppParameters);         // prepare the application parameters meminifile
+
+  meMessages.Lines.Clear;                                         // clear the box
+  LServerConnection := IniFileMgr.GetServerParams;                // request parameters for server connection
+  with LServerConnection do                                       // move the parameters
+  begin                                                           // from the request record
+    leServerHostName.Text := ServerHostName;                      // to the individual
+    leServerPort.Text := ServerPort;                              // controls
+    leServerLoginName.Text := ServerLoginName;                    // on the
+    leServerLoginPassword.Text := ServerLoginPassword;            // form
   end;
 end;
 
@@ -124,8 +152,8 @@ function TfHTMLSendMail.LogMsg(const AMsgSeverity: EMsgSeverity;
   const AMessage: String; const AParams: array of TVarRec;
   var ANewLines: TStringList): boolean;
 begin
-  Result := LogMsg(AMsgSeverity, AMessage, AParams);   // format and insert the message
-  meMessages.Lines.AddStrings(ANewLines);              // append the new lines to the end of the memo box
+  Result := LogMsg(AMsgSeverity, AMessage, AParams);              // format and insert the message
+  meMessages.Lines.AddStrings(ANewLines);                         // append the new lines to the end of the memo box
 end;
 
 { Local Message Logging uses memo box to display messages in a uniform format.
@@ -133,18 +161,23 @@ end;
 
 function TfHTMLSendMail.LogMsg(const AMsgSeverity: EMsgSeverity; const AMessage: String; const AParams: array of TVarRec): boolean;
 begin
-  meMessages.Lines.Add(Format('%s - %s',               // format and insert the message
+  meMessages.Lines.Add(Format('%s - %s',                          // format and insert the message
     [AMsgSeverity.ToString, Format(AMessage, AParams)]));
 end;
 
 procedure TfHTMLSendMail.sbDrawerClick(Sender: TObject);
 begin
-  svMain.Opened := not svMain.Opened;                  // toggle the split view open and closed
+  svMain.Opened := not svMain.Opened;                             // toggle the split view open and closed
+end;
+
+procedure TfHTMLSendMail.SetIniFileMgr(const Value: IIniFileMgr);
+begin
+  FIniFileMgr := Value;
 end;
 
 procedure TfHTMLSendMail.svMainDblClick(Sender: TObject);
 begin
-  svMain.Opened := NOT svMain.Opened; // toggle the split view  open and closed
+  svMain.Opened := NOT svMain.Opened;                             // toggle the split view  open and closed
 end;
 
 end.

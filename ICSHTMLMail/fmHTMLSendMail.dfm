@@ -392,4 +392,9 @@ object fHTMLSendMail: TfHTMLSendMail
       ExplicitWidth = 858
     end
   end
+  object vuMain: TVersionUtility
+    AppName = 'HTMSendMail'
+    Left = 48
+    Top = 1024
+  end
 end

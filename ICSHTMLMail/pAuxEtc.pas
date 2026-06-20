@@ -2,7 +2,7 @@ unit pAuxEtc;
 
 { Implements helper classes for various ICS enumerations.
   Defines records with constructors for convenient and efficient passing of
-    component properties between methods.
+  component properties between methods.
   Defines any needed Interfaces that might be required for archetectural reasons.
   Author: Milan Vydareny
   Permission granted for commercial and private use.
@@ -57,6 +57,14 @@ type
     ['{FB78C070-A55D-443C-9DF5-C0D7265F2AEB}']
     function LogMsg(const AMsgSeverity: EMsgSeverity; const AMessage: String; const AParams: array of TVarRec): boolean;
     function LogMsgLines(const AMsgSeverity: EMsgSeverity; const AMessage: String; const AParams: array of TVarRec; var ANewLines: TStringList): boolean;
+  end;
+
+  { Interface used to invoke and manage Inifile Manager }
+  IIniFileMgr = interface
+    ['{FA4F6512-5448-43A2-9488-455C0DD85D05}']
+    function GetServerParams: RServerConnection;    // obtain server parameters from inifile and return as record entries
+    function SaveServerParams(const AServerConnection: RServerConnection;
+      const AForceWrite: boolean = False): boolean; // accept record with server entries and write back to inifile
   end;
 
 implementation
