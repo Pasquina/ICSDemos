@@ -3,7 +3,10 @@
         <ProjectGuid>{B202FDE4-BB99-46F5-A8A5-CD809D21B7F2}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="ICSHTMLMail\HTMLSendMail.dproj">
+        <Projects Include="ICSHTMLMail\VCLHTMLSendMail.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="FMHTMLMail\FMHTMLSendMail.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -14,23 +17,32 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="HTMLSendMail">
-        <MSBuild Projects="ICSHTMLMail\HTMLSendMail.dproj"/>
+    <Target Name="VCLHTMLSendMail">
+        <MSBuild Projects="ICSHTMLMail\VCLHTMLSendMail.dproj"/>
     </Target>
-    <Target Name="HTMLSendMail:Clean">
-        <MSBuild Projects="ICSHTMLMail\HTMLSendMail.dproj" Targets="Clean"/>
+    <Target Name="VCLHTMLSendMail:Clean">
+        <MSBuild Projects="ICSHTMLMail\VCLHTMLSendMail.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="HTMLSendMail:Make">
-        <MSBuild Projects="ICSHTMLMail\HTMLSendMail.dproj" Targets="Make"/>
+    <Target Name="VCLHTMLSendMail:Make">
+        <MSBuild Projects="ICSHTMLMail\VCLHTMLSendMail.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="FMHTMLSendMail">
+        <MSBuild Projects="FMHTMLMail\FMHTMLSendMail.dproj"/>
+    </Target>
+    <Target Name="FMHTMLSendMail:Clean">
+        <MSBuild Projects="FMHTMLMail\FMHTMLSendMail.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FMHTMLSendMail:Make">
+        <MSBuild Projects="FMHTMLMail\FMHTMLSendMail.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="HTMLSendMail"/>
+        <CallTarget Targets="VCLHTMLSendMail;FMHTMLSendMail"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="HTMLSendMail:Clean"/>
+        <CallTarget Targets="VCLHTMLSendMail:Clean;FMHTMLSendMail:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="HTMLSendMail:Make"/>
+        <CallTarget Targets="VCLHTMLSendMail:Make;FMHTMLSendMail:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

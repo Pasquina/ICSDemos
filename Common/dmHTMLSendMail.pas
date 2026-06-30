@@ -8,6 +8,7 @@ uses
   System.IniFiles,
   pVersionUtility,
   pAuxEtc,
+  pInterfaces,
   OverbyteIcsTypes,
   OverbyteIcsSslBase,
   OverbyteIcsWndControl,
@@ -51,8 +52,7 @@ implementation
 
 
 uses
-  System.IOUtils,
-  Dialogs;
+  System.IOUtils;
 
 {$R *.dfm}
 

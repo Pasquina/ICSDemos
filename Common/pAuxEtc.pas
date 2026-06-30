@@ -1,0 +1,206 @@
+unit pAuxEtc;
+
+{ Defines enumerations and sets.
+  Implements helper classes for various enumerations.
+  Defines records with constructors for convenient and efficient passing of
+  component properties between methods.
+  Author: Milan Vydareny
+  Permission granted for commercial and private use.
+  Attribution appreciated, but not required.
+}
+
+interface
+
+uses OverbyteIcsTypes,
+  System.Classes,
+  VCL.ComCtrls,
+  FMX.ListView,
+  FMX.ListView.Types,
+  FMX.ListView.Appearances;
+
+type
+
+  { Enumeratdions and Sets }
+
+  EReqTypes = set of TSMTPRequest;                              // sometimes a set of enumerations can be useful
+  SReqType = type string;                                       // avoids a clash with existing string helpers
+
+  EMsgSeverity = (emsInfo, emsWarn, emsError, emsCatastrophic); // message level severity
+  EMsgSeveritys = set of EMsgSeverity;                          // tdhe set of all message severities
+  SMsgSeverity = type string;                                   // for display message severity avoiding a clash with string helpers
+
+  { Record or Class Helpers }
+
+  TReqTypeHelper = record helper for TSMTPRequest               // convert Request Type enumeration to a string
+  public
+    function ToString: SReqType;                                // quite simple really
+  end;
+
+  TReqTypeStringHelper = record helper for SReqType             // the reverse of ToString
+  public
+    function ToReqType: TSMTPRequest;                           // convert the string to the enum
+  end;
+
+  TMsgSeverityHelper = record helper for EMsgSeverity           // convert the message severity to a string
+    function ToString: SMsgSeverity;                            // make the message severity readable
+  end;
+
+  TMsgSeverityStringHelper = record helper for SMsgSeverity     // the reverse of ToString
+    function ToMsgSeverity: EMsgSeverity;                       // convert the string to the enumeration
+  end;
+
+  LoadList = class
+    class procedure Load<T>(const AStrings: TStrings; const [ref] AEnumValues: array of T); overload; static;
+    class procedure Load<T>(const AListView: TListView; const [ref] AEnumValues: array of T); overload; static;
+    class procedure Load<T>(const AListView: VCL.ComCtrls.TListView; const [ref] AEnumValues: array of T; const AGroupID: integer = -1); overload; static;
+  end;
+
+  { Record used to pass server parameter information. }
+
+  RServerConnection = record
+    ServerHostName: string;      // SMTP Server FQDN
+    ServerPort: string;          // SMTP Server Host (May be Symbolic or numeric)
+    ServerLoginName: string;     // SMTP Server Login Name
+    ServerLoginPassword: string; // SMTP Server Login Password
+    constructor Create(const AServerHostName: string; AServerPort: string; const AServerLoginName: string; AServerLoginPassword: string);
+  end;
+
+const
+
+  { Constants determine the results of the ToString conversion. }
+
+  SReqTypes:
+    array [TSMTPRequest] of SReqType = (
+    'Connect', 'Helo', 'MailFrom', 'Vrfy', 'RcptTo', 'Data', 'Quit', 'Rset',
+    'Open', 'Mail', 'Ehlo', 'Auth', 'StartTls',
+    'CalcMsgSize', 'MailFromSIZE', 'ToFile', 'Custom');
+
+  SMsgSeveritys: array [EMsgSeverity] of SMsgSeverity = (
+    'Information', 'Warning', 'Error', 'Catastrophy');
+
+implementation
+
+uses
+  System.SysUtils;
+
+{ LoadList }
+
+{ Load a TStrings using the ToString values from an enumeration. }
+
+class procedure LoadList.Load<T>(const AStrings: TStrings; const [ref] AEnumValues: array of T);
+var
+  LValue: T;                                                     // T is the Enumeraton string type in the ToString array
+begin
+  AStrings.BeginUpdate;                                          // avoid flickering
+  AStrings.Clear;                                                // this ensures that the TStrings Item Index and the Ord(Enumeration) are the same
+  for LValue in AEnumValues do                                   // loop through all enumeration readable string values
+
+    { This next statement adds the current string value to the designated TStrings object. However the compiler
+      will object unless the cast to a PString followed by a dereference is used. This is the only notation that works. }
+
+    AStrings.Add(PString(@LValue)^);                             // this notation avoids a compiler error
+  AStrings.EndUpdate;                                            // restore normal component operation
+end;
+
+{ Load a FireMonkey TListView using the ToString values from an enumeration. }
+
+class procedure LoadList.Load<T>(const AListView: FMX.TListView; const [ref] AEnumValues: array of T);
+var
+  LValue: T;                                                     // T is the Enumeration string type in the ToString array
+begin
+  AListView.BeginUpdate;                                         // avoid flickering
+  AListView.Items.Clear;                                         // ensure that the TListVIew ItemIndex and the Ord(Enumeration) are the same
+  for LValue in AEnumValues do                                   // loop through all the enumeration string values
+
+    { As with the TStrings overload, the following statement is needed to circumvent a compiler restriction that results
+      in a compatability error. The PString cast and a dereference solves the problem. It is the only known workaround. }
+
+    AListView.Items.Add.Text := PString(@LValue)^;               // create a new item and add the text
+  AListView.EndUpdate;                                           // back to allowing redraws
+end;
+
+{ Overloaded method designed specifically for use with the VCL TListView component.
+  Assumes that the base component has been configured as desired with respect to groups, style, etc.
+  This only adds items. It does not attempt to configure the component otherwise. }
+
+class procedure LoadList.Load<T>(const AListView: VCL.ComCtrls.TListView; const [ref] AEnumValues: array of T; const AGroupID: integer = -1);
+var
+  LValue: T;                                                     // T is the Enumeration string type in the ToString array
+  LListItem: VCL.ComCtrls.TListItem;                             // the newly added list item
+begin
+  AListView.Items.BeginUpdate;                                   // avoid flickering
+  AListView.Clear;                                               // ensure that the TListVIew ItemIndex and the Ord(Enumeration) are the same
+
+  for LValue in AEnumValues do                                   // loop through all the enumeration string values
+  begin
+
+    { As with the TStrings overload, the following statement is needed to circumvent a compiler restriction that results
+      in a compatability error. The PString cast and a dereference solves the problem. It is the only known workaround. }
+
+    LListItem := AListView.Items.Add;                            // add a new listview item
+    LListItem.Caption := PString(@LValue)^;                      // set the item caption
+    LListItem.GroupID := AGroupID;                               // use the specified group
+  end;
+  AListView.Items.EndUpdate;                                     // restore to normal redraws
+end;
+
+{ RServerConnection }
+
+{ Server Parameter Record constructor also provides all necessary information. }
+
+constructor RServerConnection.Create(const AServerHostName: string;
+  AServerPort: string; const AServerLoginName: string; AServerLoginPassword: string);
+begin
+  ServerHostName := AServerHostName;                             // SMTP Server Host Name
+  ServerPort := AServerPort;                                     // SMTP Server Port
+  ServerLoginName := AServerLoginName;                           // SMTP Server Login Username
+  ServerLoginPassword := AServerLoginPassword;                   // SMTP Server Login Password
+end;
+
+{ TReqTypeHelper }
+
+{ Convert the Request Type enumeration to a readable string. }
+
+function TReqTypeHelper.ToString: SReqType;
+begin
+  Result := SReqTypes[Self];                                     // return the appropriate string
+end;
+
+{ TReqTypeStringHelper }
+
+{ Convert the readable string to the correspnding enumeration. Case doesn't count. }
+
+function TReqTypeStringHelper.ToReqType: TSMTPRequest;
+var
+  LSMTPRequest: TSMTPRequest;                                    // loop variable
+begin
+  for LSMTPRequest := Low(TSMTPRequest) to High(TSMTPRequest) do // loop through the string mnemonics
+    if SameText(Self, SReqTypes[LSMTPRequest]) then              // test for a case insensitive match
+      Exit(LSMTPRequest);                                        // return the enumeration if found
+  Raise ERangeError.CreateFmt('"%s" is not a recognizable SMTP operation.', [Self]); // not found
+end;
+
+{ TMsgSeverityHelper }
+
+{ Convert the Message Severity enumeration to a readable string. }
+
+function TMsgSeverityHelper.ToString: SMsgSeverity;
+begin
+  Result := SMsgSeveritys[Self];                                 // return the readable message severity
+end;
+
+{ TMsgSeverityStringHelper }
+
+{ Convert the readable Message Severity string to the correspnding enumeration. Case doesn't count. }
+
+function TMsgSeverityStringHelper.ToMsgSeverity: EMsgSeverity;
+var
+  LMsgSeverity: EMsgSeverity;                                    // looper
+begin
+  for LMsgSeverity := Low(EMsgSeverity) to High(EMsgSeverity) do // loop through the Message Level mnemonics
+    if SameText(Self, SMsgSeveritys[LMsgSeverity]) then          // test for a case insensitive match
+      Exit(LMsgSeverity);                                        // return the enumeration if found
+  Raise ERangeError.CreateFmt('"%s" is not a recognizable Message Severity level.', [Self]); // not found
+end;
+
+end.

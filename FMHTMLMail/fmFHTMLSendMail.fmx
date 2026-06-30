@@ -1,0 +1,404 @@
+object fHTMLSendMail: TfHTMLSendMail
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 788
+  ClientWidth = 866
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object sbMain: TStatusBar
+    Anchors = []
+    Position.Y = 766.000000000000000000
+    ShowSizeGrip = True
+    Size.Width = 866.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object sbSimpleText: TLabel
+      Align = Contents
+      Margins.Left = 3.000000000000000000
+      Margins.Top = 3.000000000000000000
+      Margins.Right = 3.000000000000000000
+      Margins.Bottom = 3.000000000000000000
+      Size.Width = 860.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'sbSiimpleText'
+      TabOrder = 0
+    end
+  end
+  object tcMain: TTabControl
+    Align = Client
+    Size.Width = 866.000000000000000000
+    Size.Height = 766.000000000000000000
+    Size.PlatformDefault = False
+    TabIndex = 0
+    TabOrder = 3
+    TabPosition = PlatformDefault
+    Sizes = (
+      866s
+      740s
+      866s
+      740s)
+    object tiSettings: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 63.000000000000000000
+      Size.Height = 26.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'Settings'
+      ExplicitSize.cx = 63.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
+      object GridPanelLayout1: TGridPanelLayout
+        Align = Client
+        Size.Width = 866.000000000000000000
+        Size.Height = 740.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        ColumnCollection = <
+          item
+            Value = 50.000000000000000000
+          end
+          item
+            Value = 50.000000000000000000
+          end>
+        ControlCollection = <
+          item
+            Column = 0
+            Control = layParamsConnenct
+            Row = 0
+          end
+          item
+            Column = 0
+            Control = ComboBox1
+            Row = 2
+          end
+          item
+            Column = 1
+            Control = ListBox1
+            Row = 0
+          end
+          item
+            Column = 0
+            Control = ListView1
+            Row = 1
+          end
+          item
+            Column = 1
+            Control = meMessages
+            Row = 1
+          end
+          item
+            Column = 1
+            Control = btSendMail
+            Row = 2
+          end>
+        RowCollection = <
+          item
+            Value = 50.000000000000000000
+          end
+          item
+            Value = 50.000000000000000000
+          end
+          item
+            SizeStyle = Absolute
+            Value = 35.000000000000000000
+          end>
+        object ComboBox1: TComboBox
+          Align = Top
+          Position.Y = 705.000000000000000000
+          Size.Width = 433.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 2
+        end
+        object ListBox1: TListBox
+          Align = Client
+          Size.Width = 433.000000000000000000
+          Size.Height = 352.500000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          DisableFocusEffect = True
+          DefaultItemStyles.ItemStyle = ''
+          DefaultItemStyles.GroupHeaderStyle = ''
+          DefaultItemStyles.GroupFooterStyle = ''
+          Viewport.Width = 429.000000000000000000
+          Viewport.Height = 348.500000000000000000
+        end
+        object ListView1: TListView
+          ItemAppearanceClassName = 'TListItemAppearance'
+          ItemEditAppearanceClassName = 'TListItemShowCheckAppearance'
+          HeaderAppearanceClassName = 'TListHeaderObjects'
+          FooterAppearanceClassName = 'TListHeaderObjects'
+          Align = Client
+          Anchors = []
+          Size.Width = 433.000000000000000000
+          Size.Height = 352.500000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 3
+        end
+        object meMessages: TMemo
+          Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+          DataDetectorTypes = []
+          Align = Client
+          Size.Width = 433.000000000000000000
+          Size.Height = 352.500000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 4
+          Viewport.Width = 429.000000000000000000
+          Viewport.Height = 348.500000000000000000
+        end
+        object layParamsConnenct: TLayout
+          Align = Client
+          Size.Width = 433.000000000000000000
+          Size.Height = 352.500000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 5
+          object edServerHostName: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Top
+            TabOrder = 3
+            Position.X = 5.000000000000000000
+            Position.Y = 20.000000000000000000
+            Margins.Left = 5.000000000000000000
+            Margins.Top = 20.000000000000000000
+            Margins.Right = 5.000000000000000000
+            Margins.Bottom = 5.000000000000000000
+            Size.Width = 423.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            object lbServerPort: TLabel
+              Position.X = 3.000000000000000000
+              Position.Y = -20.000000000000000000
+              Size.Width = 413.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              Text = 'Server Host Name>'
+              TabOrder = 0
+            end
+          end
+          object edServerLoginPassword: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Top
+            TabOrder = 2
+            Position.X = 5.000000000000000000
+            Position.Y = 161.000000000000000000
+            Margins.Left = 5.000000000000000000
+            Margins.Top = 20.000000000000000000
+            Margins.Right = 5.000000000000000000
+            Margins.Bottom = 5.000000000000000000
+            Size.Width = 423.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            object Label1: TLabel
+              Position.X = 3.000000000000000000
+              Position.Y = -20.000000000000000000
+              Size.Width = 413.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              Text = 'Server Host Name>'
+              TabOrder = 0
+            end
+          end
+          object edServerLoginName: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Top
+            TabOrder = 1
+            Position.X = 5.000000000000000000
+            Position.Y = 114.000000000000000000
+            Margins.Left = 5.000000000000000000
+            Margins.Top = 20.000000000000000000
+            Margins.Right = 5.000000000000000000
+            Margins.Bottom = 5.000000000000000000
+            Size.Width = 423.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            object Label2: TLabel
+              Position.X = 3.000000000000000000
+              Position.Y = -20.000000000000000000
+              Size.Width = 413.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              Text = 'Server Host Name>'
+              TabOrder = 0
+            end
+          end
+          object edServerPort: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Top
+            TabOrder = 0
+            Position.X = 5.000000000000000000
+            Position.Y = 67.000000000000000000
+            Margins.Left = 5.000000000000000000
+            Margins.Top = 20.000000000000000000
+            Margins.Right = 5.000000000000000000
+            Margins.Bottom = 5.000000000000000000
+            Size.Width = 423.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            object Label3: TLabel
+              Position.X = 3.000000000000000000
+              Position.Y = -20.000000000000000000
+              Size.Width = 413.000000000000000000
+              Size.Height = 17.000000000000000000
+              Size.PlatformDefault = False
+              Text = 'Server Host Name>'
+              TabOrder = 0
+            end
+          end
+        end
+        object btSendMail: TButton
+          Align = Center
+          TabOrder = 6
+          Text = 'Send Mail'
+          OnClick = btSendMailClick
+        end
+      end
+    end
+    object tiMessage: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 67.000000000000000000
+      Size.Height = 26.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'Message'
+      ExplicitSize.cx = 67.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
+      object gpMessage: TGridPanelLayout
+        Align = Client
+        Size.Width = 866.000000000000000000
+        Size.Height = 740.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        ColumnCollection = <
+          item
+            Value = 50.000000000000000000
+          end
+          item
+            Value = 50.000000000000000000
+          end>
+        ControlCollection = <
+          item
+            Column = 0
+            Control = vsPlainText
+            Row = 0
+          end
+          item
+            Column = 1
+            Control = vsHTMLText
+            Row = 0
+          end>
+        RowCollection = <
+          item
+            Value = 100.000000000000000000
+          end>
+        object vsPlainText: TVertScrollBox
+          Align = Client
+          Size.Width = 433.000000000000000000
+          Size.Height = 740.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          Viewport.Width = 433.000000000000000000
+          Viewport.Height = 740.000000000000000000
+          object lbPlainText: TLabel
+            Align = MostTop
+            Margins.Left = 4.000000000000000000
+            Margins.Top = 4.000000000000000000
+            Margins.Right = 4.000000000000000000
+            Position.X = 4.000000000000000000
+            Position.Y = 4.000000000000000000
+            Size.Width = 425.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'Plan Text'
+            TabOrder = 0
+          end
+          object mePlainText: TMemo
+            Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+            DataDetectorTypes = []
+            Lines.Strings = (
+              '<h1>HTM Test Message</h1>'
+              
+                '<p>This is a test me'#223'age to determine the correct way to handle ' +
+                'the ICS SMTP components.'#169'</p>'
+              '<p>No reply is expected or nece'#223'ary.</p>'
+              '<p>It'#39's a warm 78'#176'C in Chicago.</p>'
+              '<p>Milan</p>')
+            Align = Client
+            Margins.Left = 4.000000000000000000
+            Margins.Top = 4.000000000000000000
+            Margins.Right = 4.000000000000000000
+            Margins.Bottom = 4.000000000000000000
+            Size.Width = 425.000000000000000000
+            Size.Height = 711.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 1
+            Viewport.Width = 421.000000000000000000
+            Viewport.Height = 691.000000000000000000
+          end
+        end
+        object vsHTMLText: TVertScrollBox
+          Align = Client
+          Size.Width = 433.000000000000000000
+          Size.Height = 740.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Viewport.Width = 433.000000000000000000
+          Viewport.Height = 740.000000000000000000
+          object lbHTMLText: TLabel
+            Align = MostTop
+            Margins.Left = 4.000000000000000000
+            Margins.Top = 4.000000000000000000
+            Margins.Right = 4.000000000000000000
+            Position.X = 4.000000000000000000
+            Position.Y = 4.000000000000000000
+            Size.Width = 425.000000000000000000
+            Size.Height = 17.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'HTML Text'
+            TabOrder = 0
+          end
+          object meHTMLText: TMemo
+            Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+            DataDetectorTypes = []
+            Lines.Strings = (
+              '<h1>HTM Test Message</h1>'
+              
+                '<p>This is a test me'#223'age to determine the correct way to handle ' +
+                'the ICS SMTP components.'#169'</p>'
+              '<p>No reply is expected or nece'#223'ary.</p>'
+              '<p>It'#39's a warm 78'#176'C in Chicago.</p>'
+              '<p>Milan</p>')
+            Align = Client
+            Margins.Left = 4.000000000000000000
+            Margins.Top = 4.000000000000000000
+            Margins.Right = 4.000000000000000000
+            Margins.Bottom = 4.000000000000000000
+            Size.Width = 425.000000000000000000
+            Size.Height = 711.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 1
+            Viewport.Width = 421.000000000000000000
+            Viewport.Height = 691.000000000000000000
+          end
+        end
+      end
+    end
+  end
+  object vuMain: TVersionUtility
+    AppName = 'HTMSendMail'
+    Left = 136
+    Top = 666
+  end
+end

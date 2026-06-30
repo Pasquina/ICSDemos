@@ -1,6 +1,9 @@
 unit pIniMgr;
 
 { Initialization manager.
+
+  Record types used to pass information are defined here before the management class.
+
   1. Handles a MemInifile on behalf of an invoker
   2. Retrieves and returns application information from the Inifile via a record def
   3. Accepts and saves application information to the Inifile via a record def
@@ -12,9 +15,13 @@ interface
 uses
   System.SysUtils,
   System.IniFiles,
-  pAuxEtc;
+  pAuxEtc,
+  pInterfaces;
 
 type
+
+  { File Manager Class Definition }
+
   TIniFileMgr = class(TInterfacedObject, IIniFileMgr)
   private
     FProgIni: TMemIniFile;
@@ -23,9 +30,11 @@ type
     property LogMsg: ILogMsg read FLogMsg write SetLogMsg;
     procedure SetProgIni(const Value: TMemIniFile);
     property ProgIni: TMemIniFile read FProgIni write SetProgIni;
+
   protected
   public
     constructor Create(const ALogMsg: ILogMsg; const AMemIniFQDN: TFilename);
+    destructor Destroy; override;
     function GetServerParams: RServerConnection;
     function SaveServerParams(const AServerConnection: RServerConnection; const AForceWrite: boolean = False): boolean;
   end;
@@ -37,18 +46,25 @@ implementation
 constructor TIniFileMgr.Create(const ALogMsg: ILogMsg;
   const AMemIniFQDN: TFilename);
 begin
-  LogMsg := ALogMsg;                                             // save logging callback address
-  ForceDirectories(ExtractFileDir(AMemIniFQDN));                      // make sure the path exists
-  ProgIni := TMemIniFile.Create(AMemIniFQDN);                         // open the parameters
-  ProgIni.AutoSave := True;                                      // automatic save before destruction
-  LogMsg.LogMsg(emsInfo, 'MimIniFIle creation completed.', []);       // log initialization event
+  LogMsg := ALogMsg;                                            // save logging callback address
+  ForceDirectories(ExtractFileDir(AMemIniFQDN));                // make sure the path exists
+  ProgIni := TMemIniFile.Create(AMemIniFQDN);                   // open the parameters
+  ProgIni.AutoSave := True;                                     // automatic save before destruction
+  LogMsg.LogMsg(emsInfo, 'MemIniFIle creation completed.', []); // log initialization event
+end;
+
+destructor TIniFileMgr.Destroy;
+begin
+  ProgIni.Free;                                                 // release ini file and automtically save it
 end;
 
 { Returns a record that contains the Server Parameters stored in the ini file. }
 
 function TIniFileMgr.GetServerParams: RServerConnection;
 begin
-  { Process the Server Parameter Record values. }
+
+  { Return the Server Parameter Record values. }
+
   Result := RServerConnection.Create(ProgIni.ReadString('Server', 'ServerHostName', 'Server Host Name'),
     ProgIni.ReadString('Server', 'ServerPort', 'Server Port'),
     ProgIni.ReadString('Server', 'ServerLoginName', 'Server Login Name'),

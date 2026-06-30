@@ -1,13 +1,14 @@
-program HTMLSendMail;
+program VCLHTMLSendMail;
 
 uses
   Vcl.Forms,
   fmHTMLSendMail in 'fmHTMLSendMail.pas' {fHTMLSendMail},
   Vcl.Themes,
   Vcl.Styles,
-  pAuxEtc in 'pAuxEtc.pas',
-  dmHTMLSendMail in 'dmHTMLSendMail.pas' {dHTMLSendMail: TDataModule},
-  pIniMgr in 'pIniMgr.pas';
+  pAuxEtc in '..\Common\pAuxEtc.pas',
+  pIniMgr in '..\Common\pIniMgr.pas',
+  pInterfaces in '..\Common\pInterfaces.pas',
+  dmHTMLSendMail in '..\Common\dmHTMLSendMail.pas' {dHTMLSendMail: TDataModule};
 
 {$R *.res}
 

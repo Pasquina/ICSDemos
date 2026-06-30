@@ -1,6 +1,9 @@
 unit pIniMgr;
 
 { Initialization manager.
+
+  Record types used to pass information are defined here before the management class.
+
   1. Handles a MemInifile on behalf of an invoker
   2. Retrieves and returns application information from the Inifile via a record def
   3. Accepts and saves application information to the Inifile via a record def
@@ -15,6 +18,19 @@ uses
   pAuxEtc;
 
 type
+
+  { Record used to pass server parameter information. }
+
+  RServerConnection = record
+    ServerHostName: string;                                     // SMTP Server FQDN
+    ServerPort: string;                                         // SMTP Server Host (May be Symbolic or numeric)
+    ServerLoginName: string;                                    // SMTP Server Login Name
+    ServerLoginPassword: string;                                // SMTP Server Login Password
+    constructor Create(const AServerHostName: string; AServerPort: string; const AServerLoginName: string; AServerLoginPassword: string);
+  end;
+
+  { File Manager Class Definition }
+
   TIniFileMgr = class(TInterfacedObject, IIniFileMgr)
   private
     FProgIni: TMemIniFile;
@@ -33,6 +49,19 @@ type
   end;
 
 implementation
+
+{ RServerConnection }
+
+{ Server Parameter Record constructor also provides all necessary information. }
+
+constructor RServerConnection.Create(const AServerHostName: string;
+  AServerPort: string; const AServerLoginName: string; AServerLoginPassword: string);
+begin
+  ServerHostName := AServerHostName;                                                         // SMTP Server Host Name
+  ServerPort := AServerPort;                                                                 // SMTP Server Port
+  ServerLoginName := AServerLoginName;                                                       // SMTP Server Login Username
+  ServerLoginPassword := AServerLoginPassword;                                               // SMTP Server Login Password
+end;
 
 { TIniFileMgr }
 
